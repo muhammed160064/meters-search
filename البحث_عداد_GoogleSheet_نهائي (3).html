@@ -1,0 +1,90 @@
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>البحث عن موقع عداد - Google Sheet</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.1/tabletop.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            background: #f9f9f9;
+            padding: 40px;
+        }
+        input {
+            width: 300px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        #result {
+            margin-top: 20px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+<h2>🔎 البحث عن موقع عداد من Google Sheets</h2>
+<p>أدخل الرقم المصنعي أو رقم الاشتراك أو رقم الحساب:</p>
+<input type="text" id="searchInput" placeholder="مثال: LYE1820300388711 أو 4310851998 أو 30006217564">
+<button onclick="search()">بحث</button>
+
+<div id="result"></div>
+
+<script>
+    let meterData = [];
+
+    window.onload = function() {
+        Tabletop.init({
+            key: '1zG3ByEpRiklWhm94vr5h-SYYjNwgnmSv',
+            simpleSheet: true,
+            callback: function(data) {
+                meterData = data;
+            }
+        });
+    }
+
+    function search() {
+        const query = document.getElementById("searchInput").value.trim();
+        const resultDiv = document.getElementById("result");
+        resultDiv.innerHTML = "";
+
+        if (!query) {
+            resultDiv.innerHTML = "<p>يرجى إدخال رقم.</p>";
+            return;
+        }
+
+        const match = meterData.find(item =>
+            item["الرقم المصنعي"] === query ||
+            item["رقم الاشتراك"] === query ||
+            item["رقم الحساب"] === query ||
+            item["رقم الاشتراك"] === query.toString() ||
+            item["رقم الحساب"] === query.toString()
+        );
+
+        if (match) {
+            resultDiv.innerHTML = `
+                <h3>📍 تم العثور على العداد:</h3>
+                <p><strong>رقم الحساب:</strong> ${match["رقم الحساب"] || "غير متوفر"}</p>
+                <p><strong>الرقم المصنعي:</strong> ${match["الرقم المصنعي"]}</p>
+                <p><strong>رقم الاشتراك:</strong> ${match["رقم الاشتراك"]}</p>
+                <p><strong>خط العرض:</strong> ${match["خط العرض"]}</p>
+                <p><strong>خط الطول:</strong> ${match["خط الطول"]}</p>
+                <p><a href="${match["رابط Google Maps"]}" target="_blank">📍 عرض على Google Maps</a></p>
+            `;
+        } else {
+            resultDiv.innerHTML = "<p>❌ لم يتم العثور على العداد.</p>";
+        }
+    }
+</script>
+
+</body>
+</html>
