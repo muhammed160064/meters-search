@@ -2,8 +2,8 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>البحث من شيت Google Sheet</title>
-  <script src="https://cdn.jsdelivr.net/npm/tabletop@1.5.1/tabletop.min.js"></script>
+  <title>البحث من جداول Google Sheet</title>
+  <script src="https://cdn.jsdelivr.net/npm/tabletop@1.5.4/tabletop.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -26,9 +26,9 @@
   </style>
 </head>
 <body>
-  <h1>البحث عن العداد</h1>
+  <h2>البحث عن العداد</h2>
   <input type="text" id="searchInput" placeholder="أدخل رقم العداد أو المشترك أو المصنعي">
-  <button onclick="search()">بحث</button>
+  <button onclick="searchData()">بحث</button>
   <div id="result"></div>
 
   <script>
@@ -44,28 +44,19 @@
       });
     }
 
-    function search() {
+    function searchData() {
       const input = document.getElementById('searchInput').value.trim();
       const resultDiv = document.getElementById('result');
-      resultDiv.innerHTML = '';
-
-      if (input === '') {
-        resultDiv.innerHTML = '<p>يرجى إدخال قيمة للبحث.</p>';
-        return;
-      }
-
-      const found = sheetData.find(row =>
-        row['رقم العداد'] === input ||
-        row['رقم المشترك'] === input ||
-        row['الرقم المصنعي'] === input
+      const result = sheetData.find(row =>
+        row.العداد === input || row.المشترك === input || row.المصنعي === input
       );
 
-      if (found) {
+      if (result) {
         resultDiv.innerHTML = `
-          <p><strong>رقم العداد:</strong> ${found['رقم العداد']}</p>
-          <p><strong>رقم المشترك:</strong> ${found['رقم المشترك']}</p>
-          <p><strong>الرقم المصنعي:</strong> ${found['الرقم المصنعي']}</p>
-          <p><a href="${found['رابط الموقع']}" target="_blank">فتح موقع العداد</a></p>
+          <p><strong>رقم العداد:</strong> ${result.العداد}</p>
+          <p><strong>رقم المشترك:</strong> ${result.المشترك}</p>
+          <p><strong>الرقم المصنعي:</strong> ${result.المصنعي}</p>
+          <p><strong>الموقع:</strong> <a href="${result.الموقع}" target="_blank">فتح الموقع</a></p>
         `;
       } else {
         resultDiv.innerHTML = '<p>لم يتم العثور على نتائج.</p>';
@@ -76,4 +67,3 @@
   </script>
 </body>
 </html>
-
