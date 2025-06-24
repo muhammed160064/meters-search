@@ -1,11 +1,79 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="UTF-8" />
-  <title>اختبار الصفحة</title>
+  <meta charset="UTF-8">
+  <title>البحث من شيت Google Sheet</title>
+  <script src="https://cdn.jsdelivr.net/npm/tabletop@1.5.1/tabletop.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      direction: rtl;
+      background: #f9f9f9;
+      padding: 40px;
+    }
+    input {
+      width: 300px;
+      padding: 10px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+    #result {
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
-  <h1>تم النشر بنجاح!</h1>
-  <p>هذه الصفحة تعمل الآن على GitHub Pages.</p>
+  <h1>البحث عن العداد</h1>
+  <input type="text" id="searchInput" placeholder="أدخل رقم العداد أو المشترك أو المصنعي">
+  <button onclick="search()">بحث</button>
+  <div id="result"></div>
+
+  <script>
+    let sheetData = [];
+
+    function init() {
+      Tabletop.init({
+        key: 'https://docs.google.com/spreadsheets/d/1zG3ByEpRiklWhm94vr5h-SYYjNwgnmSv/pubhtml',
+        simpleSheet: true,
+        callback: function(data) {
+          sheetData = data;
+        }
+      });
+    }
+
+    function search() {
+      const input = document.getElementById('searchInput').value.trim();
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = '';
+
+      if (input === '') {
+        resultDiv.innerHTML = '<p>يرجى إدخال قيمة للبحث.</p>';
+        return;
+      }
+
+      const found = sheetData.find(row =>
+        row['رقم العداد'] === input ||
+        row['رقم المشترك'] === input ||
+        row['الرقم المصنعي'] === input
+      );
+
+      if (found) {
+        resultDiv.innerHTML = `
+          <p><strong>رقم العداد:</strong> ${found['رقم العداد']}</p>
+          <p><strong>رقم المشترك:</strong> ${found['رقم المشترك']}</p>
+          <p><strong>الرقم المصنعي:</strong> ${found['الرقم المصنعي']}</p>
+          <p><a href="${found['رابط الموقع']}" target="_blank">فتح موقع العداد</a></p>
+        `;
+      } else {
+        resultDiv.innerHTML = '<p>لم يتم العثور على نتائج.</p>';
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
 </body>
 </html>
+
