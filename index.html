@@ -2,8 +2,8 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>البحث من جداول Google Sheet</title>
-  <script src="https://cdn.jsdelivr.net/npm/tabletop@1.5.4/tabletop.min.js"></script>
+  <title>البحث عن العداد</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.1/tabletop.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -23,43 +23,54 @@
     #result {
       margin-top: 20px;
     }
+    a {
+      color: blue;
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
   <h2>البحث عن العداد</h2>
-  <input type="text" id="searchInput" placeholder="أدخل رقم العداد أو المشترك أو المصنعي">
+  <input type="text" id="searchInput" placeholder="ادخل رقم العداد أو المشترك أو المصنعي">
   <button onclick="searchData()">بحث</button>
   <div id="result"></div>
 
   <script>
-    let sheetData = [];
+    let data = [];
 
     function init() {
       Tabletop.init({
-        key: 'https://docs.google.com/spreadsheets/d/1zG3ByEpRiklWhm94vr5h-SYYjNwgnmSv/pubhtml',
-        simpleSheet: true,
-        callback: function(data) {
-          sheetData = data;
-        }
+        key: 'https://docs.google.com/spreadsheets/d/1zG3ByEpRiklWhm94vr5h-SYYjNwgnmSv/edit?usp=sharing',
+        callback: function(sheetData) {
+          data = sheetData;
+        },
+        simpleSheet: true
       });
     }
 
     function searchData() {
-      const input = document.getElementById('searchInput').value.trim();
+      const query = document.getElementById('searchInput').value.trim();
       const resultDiv = document.getElementById('result');
-      const result = sheetData.find(row =>
-        row.العداد === input || row.المشترك === input || row.المصنعي === input
+      resultDiv.innerHTML = '';
+
+      if (!query) {
+        resultDiv.innerHTML = 'الرجاء إدخال قيمة للبحث.';
+        return;
+      }
+
+      const found = data.find(row =>
+        row['الرقم المصنعي'] === query ||
+        row['رقم الاشتراك'] === query
       );
 
-      if (result) {
+      if (found) {
         resultDiv.innerHTML = `
-          <p><strong>رقم العداد:</strong> ${result.العداد}</p>
-          <p><strong>رقم المشترك:</strong> ${result.المشترك}</p>
-          <p><strong>الرقم المصنعي:</strong> ${result.المصنعي}</p>
-          <p><strong>الموقع:</strong> <a href="${result.الموقع}" target="_blank">فتح الموقع</a></p>
+          <p><strong>رقم المصنعي:</strong> ${found['الرقم المصنعي']}</p>
+          <p><strong>رقم الاشتراك:</strong> ${found['رقم الاشتراك']}</p>
+          <p><a href="${found['Google Maps رابط']}" target="_blank">رابط الموقع على الخريطة</a></p>
         `;
       } else {
-        resultDiv.innerHTML = '<p>لم يتم العثور على نتائج.</p>';
+        resultDiv.innerHTML = 'لم يتم العثور على نتائج.';
       }
     }
 
